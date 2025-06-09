@@ -1,0 +1,13 @@
+node_modules/
+.env
+logs
+*.log
+.DS_Store
+.cache
+dist/
+build/
+contacts (1).json
+tests
+testContacts.js
+mongodb-compass-1.46.3-darwin-x64.dmg
+*.dmg
