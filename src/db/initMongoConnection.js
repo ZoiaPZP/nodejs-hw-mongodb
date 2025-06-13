@@ -15,9 +15,9 @@ console.log('Connecting to MongoDB at:', mongoUri);
 
   try {
     await mongoose.connect(mongoUri);
-    console.log('✅ Mongo connection successfully established!');
+    console.log('Mongo connection successfully established!');
   } catch (error) {
-    console.error('❌ Mongo connection failed:', error.message);
+    console.error('Mongo connection failed:', error.message);
     process.exit(1);
   }
 };

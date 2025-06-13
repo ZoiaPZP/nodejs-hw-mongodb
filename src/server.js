@@ -1,7 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
-import contactsRouter from './routes/contacts.routes.js';
+import contactsRouter from './routes/contacts.js';
+import createError from 'http-errors';
+import { errorHandler } from './middlewares/errorHandler.js';
 
 export const setupServer = () => {
   const app = express();
@@ -16,14 +18,18 @@ export const setupServer = () => {
     });
   });
 
-  app.use('/contacts', contactsRouter);
+  app.use('/api/contacts', contactsRouter);
 
-  app.use((req, res) => {
-    res.status(404).json({ message: 'Not found' });
+  app.use((req, res, next) => {
+    next(createError(404, 'Route not found'));
   });
+
+  app.use(errorHandler);
 
   return app;
 };
+
+
 
 
 
