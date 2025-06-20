@@ -25,7 +25,6 @@ export const setupServer = () => {
     next(createError(404, 'Route not found'));
   });
 
-  
   app.use(errorHandler);
 
   return app;

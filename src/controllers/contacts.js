@@ -10,11 +10,34 @@ import {
 } from '../services/contacts.js';
 
 export const getAllContacts = async (req, res) => {
-  const contacts = await listContacts();
+  const {
+    page = 1,
+    perPage = 10,
+    sortBy = 'name',
+    sortOrder = 'asc',
+    type,
+    isFavourite,
+  } = req.query;
+
+  const filters = {
+    ...(type && { contactType: type }),
+    ...(isFavourite !== undefined && { isFavourite: isFavourite === 'true' }),
+  };
+
+  const result = await listContacts(+page, +perPage, sortBy, sortOrder, filters);
+
   res.status(200).json({
     status: 200,
     message: 'Successfully found contacts!',
-    data: contacts,
+    data: {
+      data: result.data,
+      page: result.page,
+      perPage: result.perPage,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      hasPreviousPage: result.hasPreviousPage,
+      hasNextPage: result.hasNextPage,
+    },
   });
 };
 
@@ -62,7 +85,7 @@ export const removeContact = async (req, res) => {
 
   res.status(204).send();
 };
-  
+
 export const updateContact = async (req, res) => {
   const { contactId } = req.params;
 
@@ -107,6 +130,9 @@ export const updateStatusContact = async (req, res) => {
     data: updated,
   });
 };
+
+
+
 
 
 
