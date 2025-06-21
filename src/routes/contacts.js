@@ -17,8 +17,11 @@ import {
   updateStatusSchema,
 } from '../validation/contactsValidation.js';
 
+import { authenticate } from '../middlewares/authenticate.js';  
+
 const router = express.Router();
 
+router.use(authenticate); 
 
 router.get('/', ctrlWrapper(getAllContacts));
 
@@ -35,6 +38,7 @@ router.patch('/:contactId', isValidId, validateBody(updateContactSchema), ctrlWr
 router.patch('/:contactId/favorite', isValidId, validateBody(updateStatusSchema), ctrlWrapper(updateStatusContact));
 
 export default router;
+
 
 
 

@@ -24,7 +24,14 @@ export const getAllContacts = async (req, res) => {
     ...(isFavourite !== undefined && { isFavourite: isFavourite === 'true' }),
   };
 
-  const result = await listContacts(+page, +perPage, sortBy, sortOrder, filters);
+  const result = await listContacts(
+    req.user._id, 
+    +page,
+    +perPage,
+    sortBy,
+    sortOrder,
+    filters
+  );
 
   res.status(200).json({
     status: 200,
@@ -48,7 +55,7 @@ export const getContactById = async (req, res) => {
     throw createError(404, 'Contact not found');
   }
 
-  const contact = await getContact(contactId);
+  const contact = await getContact(contactId, req.user._id); 
 
   if (!contact) {
     throw createError(404, 'Contact not found');
@@ -62,13 +69,16 @@ export const getContactById = async (req, res) => {
 };
 
 export const addContact = async (req, res) => {
-  const newContact = await add(req.body);
+ 
+  const newContact = await add(req.body, req.user._id);
   res.status(201).json({
     status: 201,
     message: 'Successfully created a contact!',
     data: newContact,
   });
 };
+
+
 
 export const removeContact = async (req, res) => {
   const { contactId } = req.params;
@@ -77,7 +87,7 @@ export const removeContact = async (req, res) => {
     throw createError(404, 'Contact not found');
   }
 
-  const deletedContact = await remove(contactId);
+  const deletedContact = await remove(contactId, req.user._id); 
 
   if (!deletedContact) {
     throw createError(404, 'Contact not found');
@@ -93,7 +103,7 @@ export const updateContact = async (req, res) => {
     throw createError(404, 'Contact not found');
   }
 
-  const updated = await update(contactId, req.body);
+  const updated = await update(contactId, req.body, req.user._id); 
 
   if (!updated) {
     throw createError(404, 'Contact not found');
@@ -118,7 +128,7 @@ export const updateStatusContact = async (req, res) => {
     throw createError(400, '"isFavourite" must be a boolean');
   }
 
-  const updated = await update(contactId, { isFavourite });
+  const updated = await update(contactId, { isFavourite }, req.user._id); 
 
   if (!updated) {
     throw createError(404, 'Contact not found');
@@ -130,6 +140,7 @@ export const updateStatusContact = async (req, res) => {
     data: updated,
   });
 };
+
 
 
 
