@@ -52,7 +52,8 @@ export const refreshSession = async (refreshToken) => {
     refreshTokenValidUntil,
   });
 
-  return { accessToken: newAccessToken };
+  return { accessToken: newAccessToken, newRefreshToken };
+
 };
 
 export const logout = async (refreshToken) => {

@@ -61,7 +61,7 @@ const login = async (req, res) => {
 
   await authService.deleteSessionsByUserId(userId);
 
-  await authService.createSession({
+  const session = await authService.createSession({
     userId,
     accessToken,
     refreshToken,
@@ -71,6 +71,12 @@ const login = async (req, res) => {
 
   res
     .cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    .cookie('sessionId', session._id.toString(), {
       httpOnly: true,
       sameSite: 'strict',
       secure: process.env.NODE_ENV === 'production',
@@ -91,15 +97,22 @@ const refresh = async (req, res) => {
     throw createHttpError(401, 'Refresh token missing');
   }
 
-  const { accessToken } = await authService.refreshSession(refreshToken);
+  const { accessToken, newRefreshToken } = await authService.refreshSession(refreshToken);
 
-  res.status(200).json({
-    status: 'success',
-    message: 'Successfully refreshed a session!',
-    data: { accessToken },
-  });
+  res
+    .cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    .status(200)
+    .json({
+      status: 'success',
+      message: 'Successfully refreshed a session!',
+      data: { accessToken },
+    });
 };
-
 
 const logout = async (req, res) => {
   const refreshToken = req.cookies?.refreshToken;
@@ -111,6 +124,7 @@ const logout = async (req, res) => {
   await authService.logout(refreshToken);
 
   res.clearCookie('refreshToken');
+  res.clearCookie('sessionId');
   res.status(204).send();
 };
 
@@ -118,8 +132,10 @@ export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   refresh: ctrlWrapper(refresh),
-  logout: ctrlWrapper(logout), 
+  logout: ctrlWrapper(logout),
 };
+
+
 
 
 
