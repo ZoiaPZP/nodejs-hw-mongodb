@@ -64,5 +64,13 @@ export const logout = async (refreshToken) => {
   }
 };
 
+export const updateUserPassword = async (email, newHashedPassword) => {
+  return await User.findOneAndUpdate(
+    { email },
+    { password: newHashedPassword },
+    { new: true }
+  );
+};
+
 
 

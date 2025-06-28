@@ -17,27 +17,50 @@ import {
   updateStatusSchema,
 } from '../validation/contactsValidation.js';
 
-import { authenticate } from '../middlewares/authenticate.js';  
+import { authenticate } from '../middlewares/authenticate.js';
+import upload from '../middlewares/upload.js'; 
 
 const router = express.Router();
 
-router.use(authenticate); 
+router.use(authenticate);
 
 router.get('/', ctrlWrapper(getAllContacts));
 
 router.get('/:contactId', isValidId, ctrlWrapper(getContactById));
 
-router.post('/', validateBody(createContactSchema), ctrlWrapper(addContact));
+router.post(
+  '/',
+  upload.single('photo'), 
+  validateBody(createContactSchema),
+  ctrlWrapper(addContact)
+);
 
 router.delete('/:contactId', isValidId, ctrlWrapper(removeContact));
 
-router.put('/:contactId', isValidId, validateBody(updateContactSchema), ctrlWrapper(updateContact));
+router.put(
+  '/:contactId',
+  isValidId,
+  validateBody(updateContactSchema),
+  ctrlWrapper(updateContact)
+);
 
-router.patch('/:contactId', isValidId, validateBody(updateContactSchema), ctrlWrapper(updateContact));
+router.patch(
+  '/:contactId',
+  isValidId,
+  upload.single('photo'), 
+  validateBody(updateContactSchema),
+  ctrlWrapper(updateContact)
+);
 
-router.patch('/:contactId/favorite', isValidId, validateBody(updateStatusSchema), ctrlWrapper(updateStatusContact));
+router.patch(
+  '/:contactId/favorite',
+  isValidId,
+  validateBody(updateStatusSchema),
+  ctrlWrapper(updateStatusContact)
+);
 
 export default router;
+
 
 
 

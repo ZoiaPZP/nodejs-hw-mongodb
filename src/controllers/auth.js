@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import * as authService from '../services/auth.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+import { sendResetEmail } from '../services/email.js';
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -128,12 +129,66 @@ const logout = async (req, res) => {
   res.status(204).send();
 };
 
+
+const sendResetEmailController = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await authService.getUserByEmail(email);
+  if (!user) {
+    throw createHttpError(404, 'User not found!');
+  }
+
+  const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '5m' });
+
+  const resetLink = `${process.env.APP_DOMAIN}/reset-password?token=${token}`;
+
+  
+  await sendResetEmail(email, resetLink);
+
+  res.status(200).json({
+    status: 200,
+    message: 'Reset password email has been successfully sent.',
+    data: {},
+  });
+};
+
+const resetPasswordController = async (req, res) => {
+  const { token, password } = req.body;
+
+  let email;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    email = decoded.email;
+  } catch {
+    throw createHttpError(401, 'Token is expired or invalid.');
+  }
+
+  const user = await authService.getUserByEmail(email);
+  if (!user) {
+    throw createHttpError(404, 'User not found!');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await authService.updateUserPassword(email, hashedPassword);
+
+  await authService.deleteSessionsByUserId(user._id);
+
+  res.status(200).json({
+    status: 200,
+    message: 'Password has been successfully reset.',
+    data: {},
+  });
+};
+
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   refresh: ctrlWrapper(refresh),
   logout: ctrlWrapper(logout),
+  sendResetEmail: ctrlWrapper(sendResetEmailController), 
+  resetPassword: ctrlWrapper(resetPasswordController),   
 };
+
 
 
 

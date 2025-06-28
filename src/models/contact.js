@@ -29,6 +29,10 @@ const contactSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    photo: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );
@@ -36,6 +40,7 @@ const contactSchema = new mongoose.Schema(
 const Contact = mongoose.model('Contact', contactSchema, 'contacts');
 
 export default Contact;
+
 
 
 

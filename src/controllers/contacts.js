@@ -1,5 +1,6 @@
 import createError from 'http-errors';
 import mongoose from 'mongoose';
+import { uploadImageToCloudinary } from '../services/cloudinary.js';
 
 import {
   listContacts,
@@ -69,16 +70,23 @@ export const getContactById = async (req, res) => {
 };
 
 export const addContact = async (req, res) => {
- 
-  const newContact = await add(req.body, req.user._id);
+  let photoUrl = null;
+
+  if (req.file) {
+    photoUrl = await uploadImageToCloudinary(req.file.buffer, req.file.originalname);
+  }
+
+  const newContact = await add(
+    { ...req.body, photo: photoUrl },
+    req.user._id
+  );
+
   res.status(201).json({
     status: 201,
     message: 'Successfully created a contact!',
     data: newContact,
   });
 };
-
-
 
 export const removeContact = async (req, res) => {
   const { contactId } = req.params;
@@ -103,7 +111,17 @@ export const updateContact = async (req, res) => {
     throw createError(404, 'Contact not found');
   }
 
-  const updated = await update(contactId, req.body, req.user._id); 
+  let photoUrl = null;
+
+  if (req.file) {
+    photoUrl = await uploadImageToCloudinary(req.file.buffer, req.file.originalname);
+  }
+
+  const updated = await update(
+    contactId,
+    photoUrl ? { ...req.body, photo: photoUrl } : req.body,
+    req.user._id
+  );
 
   if (!updated) {
     throw createError(404, 'Contact not found');
@@ -140,6 +158,8 @@ export const updateStatusContact = async (req, res) => {
     data: updated,
   });
 };
+
+
 
 
 
