@@ -1,0 +1,56 @@
+operationId: updateContactByIdPatch
+tags:
+  - Contacts
+summary: Partially update contact by ID
+description: Updates one or more fields of a specific contact by ID.
+parameters:
+  - name: contactId
+    in: path
+    required: true
+    schema:
+      type: string
+    description: Contact ID (Mongo ObjectId)
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          name:
+            type: string
+          phoneNumber:
+            type: string
+          email:
+            type: string
+            format: email
+          isFavourite:
+            type: boolean
+          contactType:
+            type: string
+            enum: [work, home, personal]
+        required: []
+responses:
+  '200':
+    description: Contact updated
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/schemas/ContactResponse.yaml'
+  '400':
+    description: Invalid input data
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 400
+            message:
+              type: string
+              example: Invalid input data
+  '404':
+    $ref: '../../../components/responses/NotFound.yaml'

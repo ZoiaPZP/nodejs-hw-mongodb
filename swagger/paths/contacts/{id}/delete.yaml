@@ -1,0 +1,43 @@
+operationId: deleteContactById
+tags:
+  - Contacts
+summary: Delete contact by ID
+description: Deletes a contact by its MongoDB ObjectId.
+parameters:
+  - name: contactId
+    in: path
+    required: true
+    schema:
+      type: string
+    description: Contact ID (Mongo ObjectId)
+security:
+  - bearerAuth: []
+responses:
+  '200':
+    description: Contact successfully deleted
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Contact deleted
+  '400':
+    description: Invalid contact ID
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 400
+            message:
+              type: string
+              example: Invalid contact ID
+  '404':
+    $ref: '../../../components/responses/NotFound.yaml'

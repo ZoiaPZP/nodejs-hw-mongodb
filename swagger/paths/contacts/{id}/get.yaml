@@ -1,0 +1,23 @@
+operationId: getContactById
+tags:
+  - Contacts
+summary: Get contact by ID
+description: Returns a contact by its ID
+parameters:
+  - name: contactId
+    in: path
+    required: true
+    description: Contact ID (Mongo ObjectId)
+    schema:
+      type: string
+security:
+  - bearerAuth: []
+responses:
+  '200':
+    description: Contact found
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/schemas/ContactResponse.yaml'
+  '404':
+    $ref: '../../../components/responses/NotFound.yaml'

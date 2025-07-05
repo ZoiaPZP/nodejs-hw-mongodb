@@ -1,0 +1,40 @@
+tags:
+  - Contacts
+summary: Create a new contact
+operationId: createContact
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        required:
+          - name
+          - phoneNumber
+        properties:
+          name:
+            type: string
+          phoneNumber:
+            type: string
+          email:
+            type: string
+            format: email
+          isFavourite:
+            type: boolean
+          contactType:
+            type: string
+            enum: [work, home, personal]
+          photo:
+            type: string
+            format: binary
+responses:
+  '201':
+    description: Contact created
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/ContactResponse.yaml'
+  '400':
+    description: Invalid input data

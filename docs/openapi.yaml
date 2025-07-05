@@ -1,0 +1,70 @@
+openapi: 3.1.0
+
+info:
+  title: My Contacts API
+  version: 1.0.0
+  description: |
+    API for managing user contacts. Allows you to create, update, delete contacts, upload photos, and change the "favorite" status.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: https://your-deployment-url.com
+  - url: https://nodejs-hw-mongodb-7-i7d7.onrender.com
+
+tags:
+  - name: Contacts
+    description: Contact operations
+
+paths:
+  /contacts:
+    get:
+      $ref: ../swagger/paths/contacts/get.yaml
+    post:
+      $ref: ../swagger/paths/contacts/post.yaml
+
+  /contacts/{contactId}:
+    parameters:
+      - name: contactId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Contact ID (Mongo ObjectId)
+    get:
+      $ref: ../swagger/paths/contacts/{id}/get.yaml
+    put:
+      $ref: ../swagger/paths/contacts/{id}/put.yaml
+    patch:
+      $ref: ../swagger/paths/contacts/{id}/patch.yaml
+    delete:
+      $ref: ../swagger/paths/contacts/{id}/delete.yaml
+
+  /contacts/{contactId}/favorite:
+    parameters:
+      - name: contactId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Contact ID (Mongo ObjectId)
+    patch:
+      $ref: ../swagger/paths/contacts/{id}/favorite/patch.yaml
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Contact:
+      $ref: ../swagger/components/schemas/Contact.yaml
+    ContactResponse:
+      $ref: ../swagger/components/schemas/ContactResponse.yaml
+
+  responses:
+    NotFound:
+      $ref: ../swagger/components/responses/NotFound.yaml
