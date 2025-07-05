@@ -10,7 +10,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 
 servers:
-  - url: https://your-deployment-url.com
+  - url: http://localhost:3000
   - url: https://nodejs-hw-mongodb-8-rqln.onrender.com
 
 tags:
