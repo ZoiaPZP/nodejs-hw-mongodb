@@ -11,15 +11,12 @@ export const initMongoConnection = async () => {
 
   const mongoUri = `mongodb+srv://${MONGODB_USER}:${encodeURIComponent(MONGODB_PASSWORD)}@${MONGODB_URL}/${MONGODB_DB}?retryWrites=true&w=majority`;
 
-console.log('Connecting to MongoDB at:', mongoUri);  
-
   try {
     await mongoose.connect(mongoUri);
-    console.log('Mongo connection successfully established!');
+    console.log('MongoDB connected');
   } catch (error) {
     console.error('Mongo connection failed:', error.message);
     process.exit(1);
   }
 };
-
 
