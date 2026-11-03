@@ -6,11 +6,12 @@ extends:
   - recommended
 rules:
   no-unused-components: error
-theme:
+openapi:
   htmlTemplate: ./docs/index.html
-  colors:
-    primary:
-      main: '#32329f'
+  theme:
+    colors:
+      primary:
+        main: '#32329f'
   generateCodeSamples:
     languages:
       - lang: curl
