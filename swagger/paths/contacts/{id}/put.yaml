@@ -15,9 +15,26 @@ security:
 requestBody:
   required: true
   content:
-    application/json:
+    multipart/form-data:
       schema:
-        $ref: '../../../components/schemas/Contact.yaml'
+        type: object
+        properties:
+          name:
+            type: string
+          phoneNumber:
+            type: string
+          email:
+            type: string
+            format: email
+          isFavourite:
+            type: boolean
+          contactType:
+            type: string
+            enum: [work, home, personal]
+          photo:
+            type: string
+            format: binary
+        required: []
 responses:
   '200':
     description: Contact updated

@@ -15,7 +15,7 @@ security:
 requestBody:
   required: true
   content:
-    application/json:
+    multipart/form-data:
       schema:
         type: object
         properties:
@@ -31,6 +31,9 @@ requestBody:
           contactType:
             type: string
             enum: [work, home, personal]
+          photo:
+            type: string
+            format: binary
         required: []
 responses:
   '200':

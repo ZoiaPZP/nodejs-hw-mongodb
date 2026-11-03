@@ -40,6 +40,7 @@ router.delete('/:contactId', isValidId, ctrlWrapper(removeContact));
 router.put(
   '/:contactId',
   isValidId,
+  upload.single('photo'),
   validateBody(updateContactSchema),
   ctrlWrapper(updateContact)
 );
