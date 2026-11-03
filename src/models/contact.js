@@ -8,7 +8,7 @@ const contactSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      required: [true, 'Set phone number for contact'],
+      required: [true, 'Set phoneNumber for contact'],
     },
     email: {
       type: String,
@@ -24,6 +24,15 @@ const contactSchema = new mongoose.Schema(
       default: 'personal',
       required: true,
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    photo: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );
@@ -31,6 +40,8 @@ const contactSchema = new mongoose.Schema(
 const Contact = mongoose.model('Contact', contactSchema, 'contacts');
 
 export default Contact;
+
+
 
 
 

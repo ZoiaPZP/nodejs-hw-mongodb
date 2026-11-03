@@ -1,5 +1,6 @@
 import createError from 'http-errors';
 import mongoose from 'mongoose';
+import { uploadImageToCloudinary } from '../services/cloudinary.js';
 
 import {
   listContacts,
@@ -10,11 +11,41 @@ import {
 } from '../services/contacts.js';
 
 export const getAllContacts = async (req, res) => {
-  const contacts = await listContacts();
+  const {
+    page = 1,
+    perPage = 10,
+    sortBy = 'name',
+    sortOrder = 'asc',
+    type,
+    isFavourite,
+  } = req.query;
+
+  const filters = {
+    ...(type && { contactType: type }),
+    ...(isFavourite !== undefined && { isFavourite: isFavourite === 'true' }),
+  };
+
+  const result = await listContacts(
+    req.user._id, 
+    +page,
+    +perPage,
+    sortBy,
+    sortOrder,
+    filters
+  );
+
   res.status(200).json({
     status: 200,
     message: 'Successfully found contacts!',
-    data: contacts,
+    data: {
+      data: result.data,
+      page: result.page,
+      perPage: result.perPage,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      hasPreviousPage: result.hasPreviousPage,
+      hasNextPage: result.hasNextPage,
+    },
   });
 };
 
@@ -25,7 +56,7 @@ export const getContactById = async (req, res) => {
     throw createError(404, 'Contact not found');
   }
 
-  const contact = await getContact(contactId);
+  const contact = await getContact(contactId, req.user._id); 
 
   if (!contact) {
     throw createError(404, 'Contact not found');
@@ -39,7 +70,17 @@ export const getContactById = async (req, res) => {
 };
 
 export const addContact = async (req, res) => {
-  const newContact = await add(req.body);
+  let photoUrl = null;
+
+  if (req.file) {
+    photoUrl = await uploadImageToCloudinary(req.file.buffer, req.file.originalname);
+  }
+
+  const newContact = await add(
+    { ...req.body, photo: photoUrl },
+    req.user._id
+  );
+
   res.status(201).json({
     status: 201,
     message: 'Successfully created a contact!',
@@ -54,7 +95,7 @@ export const removeContact = async (req, res) => {
     throw createError(404, 'Contact not found');
   }
 
-  const deletedContact = await remove(contactId);
+  const deletedContact = await remove(contactId, req.user._id); 
 
   if (!deletedContact) {
     throw createError(404, 'Contact not found');
@@ -62,7 +103,7 @@ export const removeContact = async (req, res) => {
 
   res.status(204).send();
 };
-  
+
 export const updateContact = async (req, res) => {
   const { contactId } = req.params;
 
@@ -70,7 +111,17 @@ export const updateContact = async (req, res) => {
     throw createError(404, 'Contact not found');
   }
 
-  const updated = await update(contactId, req.body);
+  let photoUrl = null;
+
+  if (req.file) {
+    photoUrl = await uploadImageToCloudinary(req.file.buffer, req.file.originalname);
+  }
+
+  const updated = await update(
+    contactId,
+    photoUrl ? { ...req.body, photo: photoUrl } : req.body,
+    req.user._id
+  );
 
   if (!updated) {
     throw createError(404, 'Contact not found');
@@ -95,7 +146,7 @@ export const updateStatusContact = async (req, res) => {
     throw createError(400, '"isFavourite" must be a boolean');
   }
 
-  const updated = await update(contactId, { isFavourite });
+  const updated = await update(contactId, { isFavourite }, req.user._id); 
 
   if (!updated) {
     throw createError(404, 'Contact not found');
@@ -107,6 +158,12 @@ export const updateStatusContact = async (req, res) => {
     data: updated,
   });
 };
+
+
+
+
+
+
 
 
 
