@@ -1,26 +1,28 @@
-import nodemailer from 'nodemailer';
 import createHttpError from 'http-errors';
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
 
 export const sendResetEmail = async (to, link) => {
   try {
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM,
-      to,
-      subject: 'Reset your password',
-      html: `<p>Click the link to reset your password: <a href="${link}">${link}</a></p>`,
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'api-key': process.env.BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: { email: process.env.SMTP_FROM },
+        to: [{ email: to }],
+        subject: 'Reset your password',
+        htmlContent: `<p>Click the link to reset your password: <a href="${link}">${link}</a></p>`,
+      }),
     });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(`Brevo API error: ${response.status} ${errorBody}`);
+    }
   } catch (error) {
-  console.error('Full error sending email:', error?.response?.body || error.message || error);
-  throw createHttpError(500, 'Failed to send the email, please try again later.');
+    console.error('Full error sending email:', error?.message || error);
+    throw createHttpError(500, 'Failed to send the email, please try again later.');
   }
 };
-

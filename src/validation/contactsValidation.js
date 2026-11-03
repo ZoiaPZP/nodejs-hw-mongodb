@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
 const nameSchema = Joi.string().min(3).max(20);
-const emailSchema = Joi.string().email().min(3).max(20);
+const emailSchema = Joi.string().email().min(3).max(254);
 const phoneSchema = Joi.string()
   .pattern(/^[+]?[\d\s\-()]{3,20}$/)
   .message('PhoneNumber must contain only digits, spaces, dashes, parentheses, and may start with +')
